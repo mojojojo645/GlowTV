@@ -8,18 +8,24 @@ import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.animation.LinearInterpolator;
 import android.widget.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-/** Screensaver: a big glowing clock that drifts and breathes over the aurora background. */
+/** Screensaver: a large glowing clock that drifts and breathes over the aurora background. */
 public class GlowDream extends DreamService {
     final Handler h = new Handler(Looper.getMainLooper());
     FrameLayout root;
-    TextView clock;
+    LinearLayout box;
+    TextView clock, date;
     ValueAnimator drift;
 
     final Runnable tick = new Runnable() {
         public void run() {
-            clock.setText(DateFormat.getTimeFormat(GlowDream.this).format(new Date()));
+            Date d = new Date();
+            Locale l = Locale.getDefault();
+            clock.setText(DateFormat.getTimeFormat(GlowDream.this).format(d));
+            date.setText(new SimpleDateFormat("EEEE d MMMM", l).format(d).toUpperCase(l));
             h.postDelayed(this, 10000);
         }
     };
@@ -30,12 +36,23 @@ public class GlowDream extends DreamService {
         setFullscreen(true);
         root = new FrameLayout(this);
         root.addView(new AuroraView(this));
+        box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
         clock = new TextView(this);
         clock.setTextColor(Color.WHITE);
-        clock.setTextSize(110);
-        clock.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
-        clock.setShadowLayer(40, 0, 0, Color.WHITE);
-        root.addView(clock, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
+        clock.setTextSize(120);
+        clock.setIncludeFontPadding(false);
+        clock.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        clock.setShadowLayer(40, 0, 0, 0xCCFFFFFF);
+        date = new TextView(this);
+        date.setTextColor(0x99FFFFFF);
+        date.setTextSize(18);
+        date.setLetterSpacing(0.16f);
+        date.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        box.addView(clock);
+        box.addView(date);
+        root.addView(box, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
         setContentView(root);
     }
 
@@ -48,9 +65,9 @@ public class GlowDream extends DreamService {
         drift.setInterpolator(new LinearInterpolator());
         drift.addUpdateListener(a -> {
             float v = (float) a.getAnimatedValue();
-            clock.setTranslationX((float) Math.sin(v) * root.getWidth() * 0.18f);
-            clock.setTranslationY((float) Math.cos(v * 2) * root.getHeight() * 0.2f);
-            clock.setAlpha(0.75f + 0.25f * (float) Math.sin(v * 6));
+            box.setTranslationX((float) Math.sin(v) * root.getWidth() * 0.16f);
+            box.setTranslationY((float) Math.cos(v * 2) * root.getHeight() * 0.18f);
+            box.setAlpha(0.78f + 0.22f * (float) Math.sin(v * 6));
         });
         drift.start();
     }
