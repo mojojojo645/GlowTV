@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
         aurora.setFocus(it.idx / (float) (APPS.length - 1));
         int target = Math.max(0, it.getLeft() + it.getWidth() / 2 - W / 2);
         if (scrollAnim != null) scrollAnim.cancel();
-        scrollAnim = ObjectAnimator.ofInt(scroll, View.SCROLL_X, scroll.getScrollX(), target);
+        scrollAnim = ObjectAnimator.ofInt(scroll, "scrollX", scroll.getScrollX(), target);
         scrollAnim.setDuration(420);
         scrollAnim.setInterpolator(EASE);
         scrollAnim.start();
